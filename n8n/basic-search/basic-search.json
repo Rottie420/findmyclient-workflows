@@ -1,0 +1,613 @@
+{
+  "name": "Part 1 - Introduction (basic)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c2739b07-9f0f-4db8-9688-3b634d740e47",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -2848,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('return_result').item.json.status }}",
+              "rightValue": "completed"
+            },
+            {
+              "id": "d3d3eec4-c673-478d-8186-fa1afc30dba1",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "73710300-ae53-4f3f-8f45-499020e59ffa",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1440,
+        800
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "92f19c0b-c36e-4b02-a6b8-4368ec71f34f",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -16,
+        288
+      ],
+      "webhookId": "3ec7a643-bfa1-400a-992b-92684dda1caf",
+      "typeVersion": 2.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "options": {}
+      },
+      "id": "09257a1b-4f69-4f08-a108-c4577b362119",
+      "name": "SAVE to spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -16,
+        96
+      ],
+      "typeVersion": 4.7,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ac84b5c-8a43-4b68-affc-b40bb044b0fd",
+              "name": "query",
+              "type": "string",
+              "value": "=tokyo sushi"
+            },
+            {
+              "id": "e5c10eb2-e5ae-4d45-8463-ec83c2e117b7",
+              "name": "",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "defc04f8-cadb-4a85-82ec-9dd5b8fbd877",
+      "name": "Input Query",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -2624,
+        240
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://findmyclient.org/api/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "YOUR-API-TOKEN"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be154f9a-c6a7-4c16-8dca-4cd09b6f32d1",
+      "name": "Start Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -2400,
+        240
+      ],
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "643fc032-ede2-4a15-bfcb-c4175df5472a",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2964cb05-d258-4d27-ac7d-b20f9f01d86f",
+      "name": "reuse_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1216,
+        880
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ed6949-4a91-436d-85fe-a7eea4903fd5",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "id": "ed2e1d5a-0e21-4a6e-97bd-2b909fbbcae8",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            },
+            {
+              "id": "a070e54e-7624-4c4f-b8fd-4faca8ea1e60",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7381a10e-5746-4a71-b6af-7a0ad8f4a366",
+      "name": "return_status",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1888,
+        800
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "id": "00d090a0-15fb-4440-903b-9e641e28a3e8",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -1664,
+        800
+      ],
+      "webhookId": "395bcecc-e346-46ba-b421-19f98895da38",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "=https://findmyclient.org/api/result/{{$json[\"job_id\"]}}",
+        "options": {}
+      },
+      "id": "911eff65-d010-4c0d-bd0a-113446c9e05c",
+      "name": "return_result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -2112,
+        880
+      ],
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5e00cd1-f983-4388-97cf-050f099afd0e",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $json.job_id }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "job_id",
+        "options": {}
+      },
+      "id": "bd62b180-9a61-4087-927e-70788ef91795",
+      "name": "get_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -2176,
+        240
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7690d832-b978-4fc7-a0ff-5ff0b3588c0e",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            },
+            {
+              "id": "f1433d25-15b6-4c2d-8532-02f0ec9290c2",
+              "name": "",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37f52bfa-2a0d-44a7-8e17-1ff2ef2264fa",
+      "name": "Final Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1008,
+        288
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "result.output.emails",
+        "options": {}
+      },
+      "id": "d85c3c8f-d7b1-4e65-a3f6-a52921dfd710",
+      "name": "Split Emails",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -608,
+        192
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "errorMessage": "Keyword not found!"
+      },
+      "id": "009bc740-6768-4403-b412-f2f1b35e0968",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "position": [
+        -608,
+        384
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ ($json.result?.output?.emails || []).length > 0 }}",
+              "rightValue": "is not empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4643868d-e11f-45b7-8eb6-3d7e3fa690de",
+      "name": "if_email",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -832,
+        288
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "content": "## How it works\n\nThis workflow automates lead discovery using the FindMyClient API. It submits a search query, polls for job completion, extracts discovered email addresses, and splits them into individual items for downstream processing.\n\n1. **Configure Search Query** – An Edit Fields (Set) node defines a `query` field (business type, niche, or location) sent to the FindMyClient API.\n2. **Start Search Job** – An HTTP Request node sends a POST request to `https://findmyclient.org/api/search` with your API token and the query payload, returning a `job_id`.\n3. **Store Job ID** – An Edit Fields (Set) node saves the `job_id` for use in polling.\n4. **Check Search Status** – An HTTP Request node sends a GET request to `https://findmyclient.org/api/result/{{ $json.job_id }}` to check whether the job is `processing` or `completed`.\n5. **Evaluate Job Status** – An IF node branches based on the status: completed results proceed, processing results enter the retry loop.\n6. **Wait and Retry** – A Wait node pauses for 30 seconds, then re-checks the status using the same `job_id`, repeating until completed.\n7. **Extract Search Results** – Once completed, an Edit Fields (Set) node extracts the list of discovered emails.\n8. **Split Emails into Individual Items** – A Split Out node converts the email array into separate items for individual processing (database storage, CRM entry, outreach, enrichment, etc.).\n\n## Optional Steps\n\n- **Save Results to Google Sheets** – A disabled Google Sheets node can be enabled and connected to a Google account to automatically log discovered emails to a spreadsheet.\n- **Send Email Notifications** – A disabled Gmail node can be enabled with OAuth credentials to notify a team when a search completes, useful for sales alerts, CRM imports, or downstream triggers.\n\n## Set Up Steps\n\n1. Add your FindMyClient API token to the HTTP Request node header (`token`).\n2. Set the `query` value in the Edit Fields (Set) node to your target search term.\n3. (Optional) Connect your Google Sheets account and configure the spreadsheet destination.\n4. (Optional) Connect your Gmail account via OAuth to enable completion notifications.\n5. Activate the workflow to start submitting searches and polling for results automatically.",
+        "height": 752,
+        "width": 816,
+        "color": "#FFFFFF"
+      },
+      "id": "8d2b241d-e770-4ff1-b068-ee3b9a4d5f6a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3776,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Configuring FindMyClient API Search: \n\nSet search query, start FindMyClient search job via API, store returned job ID",
+        "height": 320,
+        "width": 624,
+        "color": 7
+      },
+      "id": "4237a45f-906d-459c-aa17-98317b866cca",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2656,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Poll Job Status Until Complete\n\nStore job ID, check status via GET, branch on result, retry after 30s wait",
+        "height": 416,
+        "width": 1024,
+        "color": 7
+      },
+      "id": "0f500093-7aa5-4e0f-8017-28d0b0e00a05",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2128,
+        688
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Extract and Split Email Results\n\nExtract discovered emails, split array into individual items for processing",
+        "height": 448,
+        "width": 624,
+        "color": 7
+      },
+      "id": "6d28df69-1012-4e4c-9632-b90026d6d915",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Optional: Google Sheets & Email Alerts\n\nEnable Google Sheets logging and Gmail notifications for completed searches",
+        "height": 624,
+        "width": 320,
+        "color": 7
+      },
+      "id": "a3a1e54c-4cc3-4140-a0ee-c0627cd3a528",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -112
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "reuse_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_email": {
+      "main": [
+        [
+          {
+            "node": "Split Emails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Query": {
+      "main": [
+        [
+          {
+            "node": "Start Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Result": {
+      "main": [
+        [
+          {
+            "node": "if_email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Emails": {
+      "main": [
+        [
+          {
+            "node": "SAVE to spreadsheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Search": {
+      "main": [
+        [
+          {
+            "node": "get_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reuse_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_result": {
+      "main": [
+        [
+          {
+            "node": "return_status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_status": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Input Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2a0d2a85-9341-4434-ac82-93e53ee09373",
+  "meta": {
+    "instanceId": "5a1b86d57ac6b30469d72a62f9dcb87c61df00f5ec213a5e28e7d1266251f127"
+  },
+  "nodeGroups": [],
+  "id": "n0W3eLJz15zJVEca",
+  "tags": [
+    {
+      "updatedAt": "2026-06-20T08:54:33.724Z",
+      "createdAt": "2026-06-20T08:54:33.724Z",
+      "id": "1bggjnoI3ihUNULN",
+      "name": "basic"
+    }
+  ]
+}

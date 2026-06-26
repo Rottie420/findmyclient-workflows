@@ -1,0 +1,317 @@
+{
+  "name": "Part 5 - Filter & Outreach",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2832,
+        832
+      ],
+      "id": "c60421ba-a514-4b45-b212-47a7074baaaa",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "rK30uG6eVV4PfWca",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet leads",
+          "cachedResultUrl": "/projects/t7NXIoUiWs5wVRaR/datatables/rK30uG6eVV4PfWca"
+        },
+        "limit": 1000
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3056,
+        832
+      ],
+      "id": "623725be-ac74-4019-99b6-85421a32667b",
+      "name": "Get Rows"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all()\n  .filter(item =>\n    item.json &&\n    item.json.verified == 1 &&\n    item.json.email &&\n    item.json.outreach !== \"sent\"\n  )\n  .map(item => ({\n    json: {\n      id: item.json.id,\n      email: item.json.email,\n      name: item.json.prefix || ''\n    }\n  }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        832
+      ],
+      "id": "45ecd8ea-a4d1-48be-8f30-b43a2e1622e5",
+      "name": "Filter Leads"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@mg.findmyclient.org",
+        "toEmail": "={{ $json.email }}",
+        "emailFormat": "text",
+        "text": "=hi {{ $json.name }}\n\nI came across your company and wanted to reach out.\n\nWe help businesses connect with high-quality B2B leads.\n\nWould you like to see a sample list?\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3504,
+        832
+      ],
+      "id": "4f3ffe1f-587e-4a74-91fb-4e80bd98b77f",
+      "name": "Send Email",
+      "webhookId": "7f5b106e-cc3e-43f0-ac42-2c3ab34345bb",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const accepted = $input.first().json.accepted;\n\nreturn accepted.map(email => {\n  return {\n    json: {\n      email: email,\n      outreach: \"sent\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3728,
+        832
+      ],
+      "id": "3bf2195d-baf4-4ce8-8e3c-ce5f2857359b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "rK30uG6eVV4PfWca",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet leads",
+          "cachedResultUrl": "/projects/t7NXIoUiWs5wVRaR/datatables/rK30uG6eVV4PfWca"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email_type",
+              "displayName": "email_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prefix",
+              "displayName": "prefix",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mx_valid",
+              "displayName": "mx_valid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verified",
+              "displayName": "verified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "outreach",
+              "displayName": "outreach",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3952,
+        832
+      ],
+      "id": "21fd00d3-b8b1-4a6d-9e3b-a93119407110",
+      "name": "Upsert row(s)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows": {
+      "main": [
+        [
+          {
+            "node": "Filter Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Leads": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert row(s)": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "086daf21-b2f7-4b27-8dd7-cbec9bece10f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a1b86d57ac6b30469d72a62f9dcb87c61df00f5ec213a5e28e7d1266251f127"
+  },
+  "nodeGroups": [],
+  "id": "ZkBwnZyVRtrTyBUW",
+  "tags": [
+    {
+      "updatedAt": "2026-06-20T07:30:25.255Z",
+      "createdAt": "2026-06-20T07:30:25.255Z",
+      "id": "B4jtm1yB1OqWNyg1",
+      "name": "smtp"
+    }
+  ]
+}

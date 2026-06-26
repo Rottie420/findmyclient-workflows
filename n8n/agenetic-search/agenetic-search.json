@@ -1,0 +1,847 @@
+{
+  "name": "Part 3 - Ai Agent Search",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5fd6bd7e-065c-4771-8411-a5c1bcfe3626",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -1680,
+        1200
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('return_result').item.json.status }}",
+              "rightValue": "completed"
+            },
+            {
+              "id": "d3d3eec4-c673-478d-8186-fa1afc30dba1",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d1fdf26-832e-4635-8b58-877d5340241f",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1232,
+        832
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://findmyclient.org/api/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "YOUR-API-TOKEN"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            },
+            {
+              "name": "max_pages",
+              "value": "50"
+            },
+            {
+              "name": "max_results",
+              "value": "50"
+            },
+            {
+              "name": "max_websites",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01a8096a-183d-4bb0-8726-94bb4ca87983",
+      "name": "Start Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -2144,
+        112
+      ],
+      "typeVersion": 4.4,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "643fc032-ede2-4a15-bfcb-c4175df5472a",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1fd752f1-353e-4a58-87f8-d2a8acf99dd5",
+      "name": "reuse_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1008,
+        912
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ed6949-4a91-436d-85fe-a7eea4903fd5",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "id": "ed2e1d5a-0e21-4a6e-97bd-2b909fbbcae8",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            },
+            {
+              "id": "a070e54e-7624-4c4f-b8fd-4faca8ea1e60",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "165c8620-52b8-43e9-aa24-d4147e80a9fb",
+      "name": "return_status",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1680,
+        832
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "id": "cf329ffc-7aee-40cc-be9e-8f034680782b",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -1456,
+        832
+      ],
+      "webhookId": "ee036cdb-9a79-4b7b-8f6a-772b90836578",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "=https://findmyclient.org/api/result/{{$json[\"job_id\"]}}",
+        "options": {}
+      },
+      "id": "f2039074-bfeb-4d11-a3c1-d621603efd8f",
+      "name": "return_result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1904,
+        912
+      ],
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5e00cd1-f983-4388-97cf-050f099afd0e",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $json.job_id }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "job_id",
+        "options": {}
+      },
+      "id": "54652f1d-f13f-4468-81bb-c0308997ca00",
+      "name": "get_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1904,
+        112
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7690d832-b978-4fc7-a0ff-5ff0b3588c0e",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            },
+            {
+              "id": "f1433d25-15b6-4c2d-8532-02f0ec9290c2",
+              "name": "",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4bbd8272-9bbe-4245-a372-a2a19f444ad1",
+      "name": "Final Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1024,
+        528
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ ($json.result?.output?.emails || []).length > 0 }}",
+              "rightValue": "is not empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2756a974-7cc6-451c-bd01-455e6ddead4b",
+      "name": "if_email",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -800,
+        528
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "jsCode": "// Clean the escaped quotes and trim the trailing newline\nconst cleanOutput = $input.first().json.output.replace(/\\\\\"/g, '\"').trim();\n\n// If the string still starts and ends with external quotes, strip them\nconst finalString = cleanOutput.startsWith('\"') && cleanOutput.endsWith('\"') \n  ? cleanOutput.slice(1, -1) \n  : cleanOutput;\n\nconst data = JSON.parse(finalString);\n\nreturn data.items.map(item => ({\n  json: {\n    query: item\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        912
+      ],
+      "id": "444ebe7a-deb4-40fb-9a88-0ab8ba14723b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d39a99f4-76a6-4917-8e5d-c0026dd534ae",
+              "name": "output",
+              "value": "={{ $json.output }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2352,
+        912
+      ],
+      "id": "99727cab-41c2-4da8-9a08-9870c50eccd8",
+      "name": "Input Query1"
+    },
+    {
+      "parameters": {
+        "url": "=https://findmyclient.org/api/result/leads/{{ $('get_job_id').item.json.job_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1664,
+        112
+      ],
+      "id": "86871dcf-9eb7-4625-b8ae-168a1f94516e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c83765c-be59-462e-97dc-ff2d9b9cc286",
+              "name": "rows",
+              "value": "={{ $('HTTP Request').item.json.rows }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1440,
+        112
+      ],
+      "id": "9bc353fd-18c3-4d6b-a27c-d9ff01d5ecc9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rows",
+        "options": {}
+      },
+      "id": "9f6292a6-bf42-4053-ac24-fdde7552c7ae",
+      "name": "Split Out Rows",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "TTZG7ewcDJbI7K44",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "/projects/t7NXIoUiWs5wVRaR/datatables/TTZG7ewcDJbI7K44"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "domain": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email_type",
+              "displayName": "email_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prefix",
+              "displayName": "prefix",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mx_valid",
+              "displayName": "mx_valid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verified",
+              "displayName": "verified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2efa630c-35f1-426d-a7bc-5514983d2e6d",
+      "name": "Insert row",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  if (Array.isArray(item.json.rows)) {\n    for (const row of item.json.rows) {\n      if (Array.isArray(row.risk)) {\n        row.risk = row.risk.join(', ');\n      }\n    }\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        336
+      ],
+      "id": "37de7669-4a4f-485d-a67f-17504b8dd108",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1472,
+        1424
+      ],
+      "id": "d47256ef-b62d-48a4-a4b1-7261205d7aaf",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "output\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -1344,
+        1424
+      ],
+      "id": "cfb004d5-8bb0-4739-a1e1-b9405b8c3946",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate a list of 50 real B2B business niches focused on contractors, trades, industrial services, building maintenance, construction suppliers, HVAC, electrical, plumbing, roofing, fabrication, or wholesale supply businesses that serve small and medium-sized businesses (SMEs), each in a different random country.\n\nYour response must be a strict JSON object containing an array of strings. Do not include markdown formatting and do not add any conversational text before or after the JSON.\n\nEach item must follow this exact format: \"City Business Type\"\n\nKeep each value short and simple, like a Google Maps search query (e.g. \"Dallas HVAC Contractor\"). Use only letters and spaces, STRICTLY no commas. Maximum 8 words per item.\n\nAvoid technology companies, software firms, IT services, marketing agencies, coworking spaces, startups, offices, and digital services.\n\nReturn exactly this structure:\n{\"items\":[\"Dallas HVAC Contractor\",\"Brisbane Roofing Supplier\",\"Johannesburg Electrical Contractor\"]}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1488,
+        1200
+      ],
+      "id": "ccccd3df-bfc1-416a-a186-ded46e385c38",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2688,
+        560
+      ],
+      "id": "19c6404f-00b5-46c7-b7e2-0f0549c265a9",
+      "name": "Loop Over Items"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "reuse_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_email": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Result": {
+      "main": [
+        [
+          {
+            "node": "if_email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Search": {
+      "main": [
+        [
+          {
+            "node": "get_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reuse_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_result": {
+      "main": [
+        [
+          {
+            "node": "return_status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_status": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Query1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Input Query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Start Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2ddd5d69-2bde-41a1-a86f-34b4f9225193",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a1b86d57ac6b30469d72a62f9dcb87c61df00f5ec213a5e28e7d1266251f127"
+  },
+  "nodeGroups": [],
+  "id": "epVPEEKnpU5VXNyE",
+  "tags": [
+    {
+      "updatedAt": "2026-06-17T03:57:14.221Z",
+      "createdAt": "2026-06-17T03:57:14.221Z",
+      "id": "VeU6FSIU8Ne5BRXa",
+      "name": "leads"
+    },
+    {
+      "updatedAt": "2026-06-19T12:06:33.304Z",
+      "createdAt": "2026-06-19T12:06:33.304Z",
+      "id": "u1ohubi2FPlpsctt",
+      "name": "ai_agent"
+    }
+  ]
+}

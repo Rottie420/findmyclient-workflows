@@ -1,0 +1,711 @@
+{
+  "name": "Part 2 - Leads Table",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a59a53a9-d7d6-4c03-960a-0676380f786a",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -2640,
+        496
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('return_result').item.json.status }}",
+              "rightValue": "completed"
+            },
+            {
+              "id": "d3d3eec4-c673-478d-8186-fa1afc30dba1",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43c23a3c-047a-469e-a032-59df77fe8709",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -1232,
+        832
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://findmyclient.org/api/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "YOUR-API-TOKEN"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a50c9c75-6cfc-4dd2-8891-21e9513bf0e1",
+      "name": "Start Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -2160,
+        320
+      ],
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "643fc032-ede2-4a15-bfcb-c4175df5472a",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "346449b2-a1c3-4b41-a6ce-78b271110233",
+      "name": "reuse_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1008,
+        912
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ed6949-4a91-436d-85fe-a7eea4903fd5",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "id": "ed2e1d5a-0e21-4a6e-97bd-2b909fbbcae8",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $('get_job_id').item.json.job_id }}"
+            },
+            {
+              "id": "a070e54e-7624-4c4f-b8fd-4faca8ea1e60",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e4708b8e-a099-4e28-a448-245645ffa695",
+      "name": "return_status",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1680,
+        832
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "id": "15452b00-d2b5-4a15-ae34-fc113ceb3a43",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -1456,
+        832
+      ],
+      "webhookId": "395bcecc-e346-46ba-b421-19f98895da38",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "=https://findmyclient.org/api/result/{{$json[\"job_id\"]}}",
+        "options": {}
+      },
+      "id": "1b2452ab-26d2-40d4-8a86-24cea6f6916a",
+      "name": "return_result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1904,
+        912
+      ],
+      "typeVersion": 4.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5e00cd1-f983-4388-97cf-050f099afd0e",
+              "name": "job_id",
+              "type": "string",
+              "value": "={{ $json.job_id }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "job_id",
+        "options": {}
+      },
+      "id": "7ec7142f-1371-4aee-a328-4b7bbb59a046",
+      "name": "get_job_id",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1936,
+        320
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7690d832-b978-4fc7-a0ff-5ff0b3588c0e",
+              "name": "result.output.emails",
+              "type": "array",
+              "value": "={{ $json.result.output.emails }}"
+            },
+            {
+              "id": "f1433d25-15b6-4c2d-8532-02f0ec9290c2",
+              "name": "",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1441f3da-4e4c-40db-8f8f-65501016f6d9",
+      "name": "Final Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1024,
+        528
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "errorMessage": "Keyword not found!"
+      },
+      "id": "042f6424-1f26-4dbf-b038-3082f86e51a7",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "position": [
+        -592,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "39e30a7c-7ac9-4212-9750-6a229243ccdf",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ ($json.result?.output?.emails || []).length > 0 }}",
+              "rightValue": "is not empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d273501a-0f6d-47ed-a9f0-2b45d1421726",
+      "name": "if_email",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -848,
+        528
+      ],
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d39a99f4-76a6-4917-8e5d-c0026dd534ae",
+              "name": "output",
+              "value": "=Singapore Money Lending\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2416,
+        496
+      ],
+      "id": "822b3f22-6637-468a-abd4-c7d90a4efc05",
+      "name": "Input Query1"
+    },
+    {
+      "parameters": {
+        "url": "=https://findmyclient.org/api/result/leads/{{ $('get_job_id').item.json.job_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1664,
+        112
+      ],
+      "id": "3e747117-190c-4f6a-8739-97b88b084c9a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c83765c-be59-462e-97dc-ff2d9b9cc286",
+              "name": "rows",
+              "value": "={{ $('HTTP Request').item.json.rows }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1440,
+        112
+      ],
+      "id": "d1aab7f3-7088-4d97-ad7b-3adefa576336",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rows",
+        "options": {}
+      },
+      "id": "12159809-ad03-4117-ba93-aab0ef38ecf2",
+      "name": "Split Out Rows",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "TTZG7ewcDJbI7K44",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "/projects/t7NXIoUiWs5wVRaR/datatables/TTZG7ewcDJbI7K44"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "domain": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email_type",
+              "displayName": "email_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mx_valid",
+              "displayName": "mx_valid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prefix",
+              "displayName": "prefix",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verified",
+              "displayName": "verified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "82d1b76a-f97e-474c-a8ed-3a5312255ef4",
+      "name": "Insert row",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  if (Array.isArray(item.json.rows)) {\n    for (const row of item.json.rows) {\n      if (Array.isArray(row.risk)) {\n        row.risk = row.risk.join(', ');\n      }\n    }\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        336
+      ],
+      "id": "088f1a25-5ea8-46b4-81a6-6e878f2b9ccc",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "reuse_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_email": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Result": {
+      "main": [
+        [
+          {
+            "node": "if_email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Search": {
+      "main": [
+        [
+          {
+            "node": "get_job_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reuse_job_id": {
+      "main": [
+        [
+          {
+            "node": "return_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_result": {
+      "main": [
+        [
+          {
+            "node": "return_status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return_status": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Input Query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Query1": {
+      "main": [
+        [
+          {
+            "node": "Start Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "df97cc61-a5b3-4065-bda0-f7f1d11b69c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a1b86d57ac6b30469d72a62f9dcb87c61df00f5ec213a5e28e7d1266251f127"
+  },
+  "nodeGroups": [],
+  "id": "aaEnsTyPoRN9bvJ4",
+  "tags": [
+    {
+      "updatedAt": "2026-06-17T03:57:14.221Z",
+      "createdAt": "2026-06-17T03:57:14.221Z",
+      "id": "VeU6FSIU8Ne5BRXa",
+      "name": "leads"
+    }
+  ]
+}
